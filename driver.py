@@ -10,6 +10,7 @@ import csv # importing the csv module
 import re #importing regex
 import random #importing random module
 from datetime import datetime
+import DBmanager
 
 def randomDataGenerator(trainingMode):
     #creating random sensorNum
@@ -96,9 +97,9 @@ def trainingProcess(playerID, trainingID, trainingMode):
     # name of csv file
     filename = "training_process.csv"
     # field names
-    fields = ['playerID', 'trainingID', 'difficultyType', 'sensorNum', 'responseTime', 'isSuccess']
-    accuracyTraining=re.compile("111*")
-    speedTraining=re.compile("000*")
+    fields = ['playerID', 'trainingID', 'sensorNum', 'responseTime', 'isSuccess']
+    accuracyTraining=re.compile("A-*")
+    speedTraining=re.compile("S-*")
 
     #it means it is a accuracy training
     if(re.match(accuracyTraining, trainingID)):
@@ -117,7 +118,7 @@ def trainingProcess(playerID, trainingID, trainingMode):
                 #getting random result of random attempt
                 isSuccess=randomData[2]
 
-                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'difficultyType': difficulty,  'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess}]
+                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess}]
                 writer.writerows(myDict)
                 csvfile.close()
 
@@ -164,7 +165,7 @@ def trainingProcess(playerID, trainingID, trainingMode):
                 # getting random result of random attempt
                 isSuccess = randomData[2]
                 myDict = [
-                    {'playerID': playerID, 'trainingID': trainingID, 'difficultyType': difficulty, 'sensorNum': sensorLight, 'responseTime': responseTime,  'isSuccess': isSuccess}]
+                    {'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess}]
                 writer.writerows(myDict)
                 csvfile.close()
 
@@ -175,15 +176,28 @@ def trainingProcess(playerID, trainingID, trainingMode):
 
 
 
-#creating random trainingID
+# creating random trainingID
 def randomTrainingID(type):
+
+
+    lastIndex = DBmanager.getNextSequence("trainingID")
+    trainingID = ""
+
+
+
     if type == 0:
-        # We need database connection to create actual trainingID. This is just simulation
-        return '1119'
+
+        trainingID = ("A-{}")
+        trainingID = (trainingID.format(lastIndex))
+        print(trainingID.format(lastIndex))
+        return trainingID
 
     elif type == 1:
-        # We need database connection to create actual trainingID. This is just simulation
-        return '00011'
+
+        trainingID = ("S-{}")
+        trainingID = (trainingID.format(lastIndex))
+        print(trainingID.format(lastIndex))
+        return trainingID
 
 
 
@@ -195,6 +209,10 @@ def randomTrainingID(type):
 
 
 def Welcome():
+    f = open("training_process.csv", "w")
+    f.truncate()
+    f.close()
+
     # Section: 'Welcome'
     print("\n ***WELCOME TO PERFORMANCE ANALYSIS TECHNOLOGY SYSTEM*** \n")
     print("Performance Analysis Technology is used to measure performance of players in wide range sports branch and "
@@ -253,3 +271,19 @@ def timeStamp():
 
 timeStamp()
 Welcome()
+
+
+
+
+
+
+"""
+*****NOTEBOOK*****
+Please add your warnings/suggestions/complaints about the program to this field as a comment and 
+mark 'Cancel/In Progress/Done' if any of comments fit.
+
+
+1. Create a new 'cache.csv' file to hold copy of data. And provide database operations through 'cache.csv' file. (In Progress)
+2. For 'RandomDataGenerator' function, write the percentage of success/unsuccess probability to final report. 
+For example, in easy mode, success rate is 3/3.5 means responseTime/(maxResponseTime-minResponseTime) (In Progress)
+"""
