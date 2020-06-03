@@ -32,21 +32,35 @@ def getNextSequence(sequenceName):
 
 
 
-with open("training_process.csv") as file:
-    csv_list = list(csv.reader(file))
 
-for row in csv_list:
-    if row:
-        NameSurname = row[0]
-        trainingID = row[1]
+def recorder():
+    with open("training_process.csv") as file:
+        csv_list = list(csv.reader(file))
+
+    for row in csv_list:
+        if row:
+            playerID = row[0]
+            trainingID = row[1]
+            sensorNo = row[2]
+            responseTime = row[3]
+            isSucces = row[4]
+            trainingMode = row[5]
+            timeStamp = row[6]
+
+            queryTraining = {"trainingID": trainingID, "sensorNo": sensorNo, "responseTime": responseTime, "isSucces": isSucces}
+            getTable("trainingsTable").insert_one(queryTraining)
+
+            queryHistory = {""}
+            getTable("historyTable").insert_one(queryHistory)
 
 
-    else:
-        # skip blank lines
-        continue
+        else:
+            # skip blank lines
+            continue
 
 
-
+# Call 'recorder()' function
+recorder()
 
 
 

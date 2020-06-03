@@ -56,7 +56,7 @@ def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'
     with open("training_process.csv") as file:
         csv_list = list(csv.reader(file))
         data = list(csv_list)
-        count = len(data) / 2
+        count = int(len(data) / 2) # returns float originally
 
         file.close()
 
@@ -74,30 +74,34 @@ def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'
 
 
 
-def trainingProcess(playerID, trainingID, trainingMode):
-    difficulty = ""
+def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
+    # Easy Mode
     if trainingMode == "E":
-        difficulty = "easy"
+        trainingMode = "Easy"
         minTouch = 10
         maxTouch = 60
+
+    # Medium Mode
     elif trainingMode == "M":
-        difficulty = "medium"
+        trainingMode = "Medium"
         minTouch = 15
         maxTouch = 60
+
+    # Hard Mode
     elif trainingMode == "H":
-        difficulty = "hard"
+        trainingMode = "Hard"
         minTouch = 20
         maxTouch = 60
 
 
-    print(trainingMode)
+
 
     #accuracy training constant=30 times sensors will light
     ACCURACY_CONSTANT=30
     # name of csv file
     filename = "training_process.csv"
     # field names
-    fields = ['playerID', 'trainingID', 'sensorNum', 'responseTime', 'isSuccess']
+    fields = ['playerID', 'trainingID', 'sensorNum', 'responseTime', 'isSuccess', 'trainingMode', 'timeStamp']
     accuracyTraining=re.compile("A-*")
     speedTraining=re.compile("S-*")
 
@@ -118,7 +122,7 @@ def trainingProcess(playerID, trainingID, trainingMode):
                 #getting random result of random attempt
                 isSuccess=randomData[2]
 
-                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess}]
+                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess,'trainingMode': trainingMode,'timeStamp': timeStamp}]
                 writer.writerows(myDict)
                 csvfile.close()
 
@@ -128,6 +132,7 @@ def trainingProcess(playerID, trainingID, trainingMode):
             confirmation = input("Do you confirm the training? Y/N")
             if confirmation == "Y" or confirmation == "y":
                 print("Confirmed, send to Database here!")
+                DBmanager.recorder()
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
 
@@ -164,20 +169,19 @@ def trainingProcess(playerID, trainingID, trainingMode):
                 responseTime = randomData[1]
                 # getting random result of random attempt
                 isSuccess = randomData[2]
-                myDict = [
-                    {'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess}]
+                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess, 'trainingMode': trainingMode, 'timeStamp': timeStamp}]
                 writer.writerows(myDict)
                 csvfile.close()
 
-        # Counts csv file if it is missing or not.
+        # Counts row in csv file if there is a missing data or not.
         dataConfirmation(randomSpeed)
 
 
 
 
 
-# creating random trainingID
-def randomTrainingID(type):
+# Generates trainingID according to training type with auto incrementation
+def TrainingIDGenerator(type):
 
 
     lastIndex = DBmanager.getNextSequence("trainingID")
@@ -241,7 +245,7 @@ def Welcome():
     difficultyType = input("Select Difficulty - E/M/H:")
 
     # Actual implementation will not be terminal application. Therefore no need to check if input is valid or not.
-    trainingID = randomTrainingID(trainingType)
+    trainingID = TrainingIDGenerator(trainingType)
 
     enterKey = input("Ready, Go!")
     # Checks if input is 'Enter' key or not.
@@ -252,11 +256,11 @@ def Welcome():
     print("\n\n\n")
 
     # Training process starts after pressed the Enter Key.
-    trainingProcess(playerID, trainingID, difficultyType)
+    trainingProcess(playerID, trainingID, difficultyType, timeStamp())
     print("\n\n\n")
     print("Process has finished!")
 
-#process is completed for one step for now
+# process is completed for one step for now
 
 
 
@@ -264,8 +268,7 @@ def Welcome():
 def timeStamp():
     time = datetime.now()
     stamp = time.strftime("%d.%m.%Y, %H:%M")
-
-    print(stamp)
+    return stamp
 
 
 
@@ -286,4 +289,5 @@ mark 'Cancel/In Progress/Done' if any of comments fit.
 1. Create a new 'cache.csv' file to hold copy of data. And provide database operations through 'cache.csv' file. (In Progress)
 2. For 'RandomDataGenerator' function, write the percentage of success/unsuccess probability to final report. 
 For example, in easy mode, success rate is 3/3.5 means responseTime/(maxResponseTime-minResponseTime) (In Progress)
+3. Review code blocks in driver.py for History Table
 """
