@@ -20,7 +20,7 @@ def randomDataGenerator(trainingMode):
     responseTime = 0.0
     isSuccess = 0
 
-    if trainingMode == "E":
+    if trainingMode == "Easy":
         responseTime = round(random.uniform(0.50, 4.00), 2)
         if responseTime < 3.00:
             isSuccess = 1
@@ -28,7 +28,7 @@ def randomDataGenerator(trainingMode):
             isSuccess = 0
             responseTime = 3.00
 
-    elif trainingMode == "M":
+    elif trainingMode == "Medium":
         responseTime = round(random.uniform(0.5, 4.0), 2)
         if responseTime < 2.00:
             isSuccess = 1
@@ -36,7 +36,7 @@ def randomDataGenerator(trainingMode):
             isSuccess = 0
             responseTime = 2.00
 
-    elif trainingMode == "H":
+    elif trainingMode == "Hard":
         responseTime = round(random.uniform(0.5, 4.0), 2)
         if responseTime < 1.50:
             isSuccess = 1
@@ -123,7 +123,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
             confirmation = input("Do you confirm the training? Y/N")
             if confirmation == "Y" or confirmation == "y":
                 print("Confirmed, send to Database here!")
-                DBmanager.recorder()
+
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
 
@@ -174,6 +174,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
             DBmanager.recorder()
         elif confirmation == "N" or confirmation == "n":
             print("Not confirmed, cancel the Training!")
+            quit()
 
             f = open("training_process.csv", "w")
             f.truncate()
@@ -229,7 +230,14 @@ def Welcome():
 
     # Section: 'Prepare the Platform'
     coachID = input('Enter Coach ID: ')  # Check if coach exists!
+    if not DBmanager.checkCoach(int(coachID)):
+        # just terminate the program
+        quit()
     playerID = input('Enter Player ID: ')  # Check if player exists!
+    if not DBmanager.checkPlayer(playerID, coachID):
+        # just terminate the program
+        quit()
+
 
     print("\n\n\n")
     print("***SETUP THE PLATFORM***")
