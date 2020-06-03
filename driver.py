@@ -6,19 +6,19 @@ Supervisor: İlker KORKMAZ
 Project Group: Ömer EROĞLU - Fatih KOCA - Oğuz Timur TAŞDELEN
 """
 
-import csv # importing the csv module
-import re #importing regex
-import random #importing random module
+import csv  # importing the csv module
+import re  # importing regex
+import random  # importing random module
 from datetime import datetime
 import DBmanager
 
+
 def randomDataGenerator(trainingMode):
-    #creating random sensorNum
-    sensorNum=random.randint(1, 12)
+    # creating random sensorNum
+    sensorNum = random.randint(1, 12)
 
     responseTime = 0.0
     isSuccess = 0
-
 
     if trainingMode == "E":
         responseTime = round(random.uniform(0.50, 4.00), 2)
@@ -44,19 +44,14 @@ def randomDataGenerator(trainingMode):
             isSuccess = 0
             responseTime = 1.50
 
-    """
-    #random result of attempt
-    isSuccess=random.randint(0,1)
-    """
-
-    return(sensorNum, responseTime, isSuccess)
+    return sensorNum, responseTime, isSuccess
 
 
 def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'
     with open("training_process.csv") as file:
         csv_list = list(csv.reader(file))
         data = list(csv_list)
-        count = int(len(data) / 2) # returns float originally
+        count = int(len(data) / 2)  # returns float originally
 
         file.close()
 
@@ -70,8 +65,6 @@ def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'
         else:
             print("There is some missing data. Please repeat the training!")
             return False
-
-
 
 
 def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
@@ -93,38 +86,36 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
         minTouch = 20
         maxTouch = 60
 
-
-
-
-    #accuracy training constant=30 times sensors will light
-    ACCURACY_CONSTANT=30
+    # accuracy training constant=30 times sensors will light
+    ACCURACY_CONSTANT = 30
     # name of csv file
     filename = "training_process.csv"
     # field names
     fields = ['playerID', 'trainingID', 'sensorNum', 'responseTime', 'isSuccess', 'trainingMode', 'timeStamp']
-    accuracyTraining=re.compile("A-*")
-    speedTraining=re.compile("S-*")
+    accuracyTraining = re.compile("A-*")
+    speedTraining = re.compile("S-*")
 
-    #it means it is a accuracy training
-    if(re.match(accuracyTraining, trainingID)):
+    # it means it is a accuracy training
+    if re.match(accuracyTraining, trainingID):
         for i in range(ACCURACY_CONSTANT):
             print("accuracy ", i)
-            with open(filename, 'a+') as csvfile:
+            with open(filename, 'a+') as csvFile:
                 # creating a csv dict writer object
-                writer = csv.DictWriter(csvfile, fieldnames=fields)
+                writer = csv.DictWriter(csvFile, fieldnames=fields)
 
-
-                randomData=randomDataGenerator(trainingMode)
-                #light sensor
-                sensorLight=randomData[0]
-                #getting random response time
+                randomData = randomDataGenerator(trainingMode)
+                # light sensor
+                sensorLight = randomData[0]
+                # getting random response time
                 responseTime = randomData[1]
-                #getting random result of random attempt
-                isSuccess=randomData[2]
+                # getting random result of random attempt
+                isSuccess = randomData[2]
 
-                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess,'trainingMode': trainingMode,'timeStamp': timeStamp}]
+                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight,
+                           'responseTime': responseTime, 'isSuccess': isSuccess, 'trainingMode': trainingMode,
+                           'timeStamp': timeStamp}]
                 writer.writerows(myDict)
-                csvfile.close()
+                csvFile.close()
 
         # Counts csv file if it is missing or not.
         if dataConfirmation(ACCURACY_CONSTANT):
@@ -136,14 +127,14 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
 
-                f = open("training_process.csv.csv", "w")
+                f = open("training_process.csv", "w")
                 f.truncate()
                 f.close()
                 Welcome()
         else:
             # There is missing data in csv file. Clear the csv file and restart the training process!
             print("")
-            f = open("training_process.csv.csv", "w")
+            f = open("training_process.csv", "w")
             f.truncate()
             f.close()
             Welcome()
@@ -151,16 +142,15 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
 
 
 
-    #Speed Training
+    # Speed Training
     else:
 
         randomSpeed = random.randint(minTouch, maxTouch)  # Generates number of touches in 30 seconds.
         for i in range(randomSpeed):
             print("speed ", i)
-            with open(filename, 'a+') as csvfile:
+            with open(filename, 'a+') as csvFile:
                 # creating a csv dict writer object
-                writer = csv.DictWriter(csvfile, fieldnames=fields)
-
+                writer = csv.DictWriter(csvFile, fieldnames=fields)
 
                 randomData = randomDataGenerator(trainingMode)
                 # light sensor
@@ -169,25 +159,39 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
                 responseTime = randomData[1]
                 # getting random result of random attempt
                 isSuccess = randomData[2]
-                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight, 'responseTime': responseTime, 'isSuccess': isSuccess, 'trainingMode': trainingMode, 'timeStamp': timeStamp}]
+                myDict = [{'playerID': playerID, 'trainingID': trainingID, 'sensorNum': sensorLight,
+                           'responseTime': responseTime, 'isSuccess': isSuccess, 'trainingMode': trainingMode,
+                           'timeStamp': timeStamp}]
                 writer.writerows(myDict)
-                csvfile.close()
+                csvFile.close()
 
         # Counts row in csv file if there is a missing data or not.
         dataConfirmation(randomSpeed)
+        # no need to check if input is valid or not because this is not an actual implementation.
+        confirmation = input("Do you confirm the training? Y/N")
+        if confirmation == "Y" or confirmation == "y":
+            print("Confirmed, send to Database here!")
+            DBmanager.recorder()
+        elif confirmation == "N" or confirmation == "n":
+            print("Not confirmed, cancel the Training!")
 
-
-
+            f = open("training_process.csv", "w")
+            f.truncate()
+            f.close()
+            Welcome()
+        else:
+            # There is missing data in csv file. Clear the csv file and restart the training process!
+            print("")
+            f = open("training_process.csv", "w")
+            f.truncate()
+            f.close()
+            Welcome()
 
 
 # Generates trainingID according to training type with auto incrementation
 def TrainingIDGenerator(type):
-
-
     lastIndex = DBmanager.getNextSequence("trainingID")
     trainingID = ""
-
-
 
     if type == 0:
 
@@ -202,14 +206,6 @@ def TrainingIDGenerator(type):
         trainingID = (trainingID.format(lastIndex))
         print(trainingID.format(lastIndex))
         return trainingID
-
-
-
-
-
-
-
-
 
 
 def Welcome():
@@ -260,9 +256,8 @@ def Welcome():
     print("\n\n\n")
     print("Process has finished!")
 
+
 # process is completed for one step for now
-
-
 
 
 def timeStamp():
@@ -271,14 +266,7 @@ def timeStamp():
     return stamp
 
 
-
-timeStamp()
 Welcome()
-
-
-
-
-
 
 """
 *****NOTEBOOK*****
