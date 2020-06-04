@@ -123,7 +123,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
             confirmation = input("Do you confirm the training? Y/N")
             if confirmation == "Y" or confirmation == "y":
                 print("Confirmed, send to Database here!")
-
+                DBmanager.recorder()
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
 
