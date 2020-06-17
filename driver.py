@@ -47,20 +47,23 @@ def randomDataGenerator(trainingMode):
     return sensorNum, responseTime, isSuccess
 
 
-def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'
+# This function checks the csv file if there is missing data or not.
+def dataConfirmation(paramVar):  # 'paramVar' means 'parameter variable'.
     with open("training_process.csv") as file:
         csv_list = list(csv.reader(file))
         data = list(csv_list)
-        count = int(len(data) / 2)  # returns float originally
+        count = int(len(data) / 2)  # returns float originally and make it type integer
 
         file.close()
 
+        """
         print("paramVar:" + str(paramVar))
         print("count:" + str(count))
         print("")
+        """
 
         if count == paramVar:
-            print("Everything is OK!")
+            print("Training has completed!")
             return True
         else:
             print("There is some missing data. Please repeat the training!")
@@ -71,23 +74,23 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
     # Easy Mode
     if trainingMode == "E":
         trainingMode = "Easy"
-        minTouch = 10
-        maxTouch = 60
+        minTouch = 4
+        maxTouch = 24
 
     # Medium Mode
     elif trainingMode == "M":
         trainingMode = "Medium"
-        minTouch = 15
-        maxTouch = 60
+        minTouch = 6
+        maxTouch = 24
 
     # Hard Mode
     elif trainingMode == "H":
         trainingMode = "Hard"
-        minTouch = 20
-        maxTouch = 60
+        minTouch = 8
+        maxTouch = 24
 
-    # accuracy training constant=30 times sensors will light
-    ACCURACY_CONSTANT = 30
+    # accuracy training constant=12 times sensors will light
+    ACCURACY_CONSTANT = 12
     # name of csv file
     filename = "training_process.csv"
     # field names
@@ -95,10 +98,10 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
     accuracyTraining = re.compile("A-*")
     speedTraining = re.compile("S-*")
 
-    # it means it is a accuracy training
+    # It means it is an accuracy training
     if re.match(accuracyTraining, trainingID):
         for i in range(ACCURACY_CONSTANT):
-            print("accuracy ", i)
+            # print("accuracy ", i)
             with open(filename, 'a+') as csvFile:
                 # creating a csv dict writer object
                 writer = csv.DictWriter(csvFile, fieldnames=fields)
@@ -122,8 +125,8 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
             # no need to check if input is valid or not because this is not an actual implementation.
             confirmation = input("Do you confirm the training? Y/N")
             if confirmation == "Y" or confirmation == "y":
-                print("Confirmed, send to Database here!")
                 DBmanager.recorder()
+                print("The training has recorded to database!")
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
 
@@ -147,7 +150,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
 
         randomSpeed = random.randint(minTouch, maxTouch)  # Generates number of touches in 30 seconds.
         for i in range(randomSpeed):
-            print("speed ", i)
+            # print("speed ", i)
             with open(filename, 'a+') as csvFile:
                 # creating a csv dict writer object
                 writer = csv.DictWriter(csvFile, fieldnames=fields)
@@ -166,20 +169,19 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
                 csvFile.close()
 
         # Counts row in csv file if there is a missing data or not.
-        dataConfirmation(randomSpeed)
-        # no need to check if input is valid or not because this is not an actual implementation.
-        confirmation = input("Do you confirm the training? Y/N")
-        if confirmation == "Y" or confirmation == "y":
-            print("Confirmed, send to Database here!")
-            DBmanager.recorder()
-        elif confirmation == "N" or confirmation == "n":
-            print("Not confirmed, cancel the Training!")
-            quit()
+        if dataConfirmation(randomSpeed):
+            # no need to check if input is valid or not because this is not an actual implementation.
+            confirmation = input("Do you confirm the training? Y/N")
+            if confirmation == "Y" or confirmation == "y":
+                DBmanager.recorder()
+                print("The training has recorded to database!")
+            elif confirmation == "N" or confirmation == "n":
+                print("Not confirmed, cancel the Training!")
 
-            f = open("training_process.csv", "w")
-            f.truncate()
-            f.close()
-            Welcome()
+                f = open("training_process.csv", "w")
+                f.truncate()
+                f.close()
+                Welcome()
         else:
             # There is missing data in csv file. Clear the csv file and restart the training process!
             print("")
@@ -198,14 +200,14 @@ def TrainingIDGenerator(type):
 
         trainingID = ("A-{}")
         trainingID = (trainingID.format(lastIndex))
-        print(trainingID.format(lastIndex))
+        # print(trainingID.format(lastIndex))
         return trainingID
 
     elif type == 1:
 
         trainingID = ("S-{}")
         trainingID = (trainingID.format(lastIndex))
-        print(trainingID.format(lastIndex))
+        # print(trainingID.format(lastIndex))
         return trainingID
 
 
@@ -265,6 +267,8 @@ def Welcome():
     print("Process has finished!")
 
 
+
+
 # process is completed for one step for now
 
 
@@ -276,14 +280,3 @@ def timeStamp():
 
 Welcome()
 
-"""
-*****NOTEBOOK*****
-Please add your warnings/suggestions/complaints about the program to this field as a comment and 
-mark 'Cancel/In Progress/Done' if any of comments fit.
-
-
-1. Create a new 'cache.csv' file to hold copy of data. And provide database operations through 'cache.csv' file. (In Progress)
-2. For 'RandomDataGenerator' function, write the percentage of success/unsuccess probability to final report. 
-For example, in easy mode, success rate is 3/3.5 means responseTime/(maxResponseTime-minResponseTime) (In Progress)
-3. Review code blocks in driver.py for History Table
-"""
