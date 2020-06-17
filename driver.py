@@ -129,6 +129,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
                 print("The training has recorded to database!")
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
+                DBmanager.reduceSequence("trainingID")
 
                 f = open("training_process.csv", "w")
                 f.truncate()
@@ -148,7 +149,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
     # Speed Training
     else:
 
-        randomSpeed = random.randint(minTouch, maxTouch)  # Generates number of touches in 30 seconds.
+        randomSpeed = random.randint(minTouch, maxTouch)  # Generates number of touches in 12 seconds.
         for i in range(randomSpeed):
             # print("speed ", i)
             with open(filename, 'a+') as csvFile:
@@ -177,6 +178,7 @@ def trainingProcess(playerID, trainingID, trainingMode, timeStamp):
                 print("The training has recorded to database!")
             elif confirmation == "N" or confirmation == "n":
                 print("Not confirmed, cancel the Training!")
+                DBmanager.reduceSequence("trainingID")
 
                 f = open("training_process.csv", "w")
                 f.truncate()

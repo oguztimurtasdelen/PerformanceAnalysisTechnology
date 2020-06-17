@@ -25,6 +25,13 @@ def getNextSequence(sequenceName):
         print("Exception Message: Error")
 
 
+# for auto_decrement
+def reduceSequence(sequenceName):
+    try:
+        sequenceDocument = getTable("testTable").find_one_and_update({}, {"$set": {"_id": sequenceName}, "$inc": {"sequence_value": -1}}, return_document=True)
+        return (sequenceDocument["sequence_value"])
+    except:
+        print("Exception Message: Error")
 
 
 
